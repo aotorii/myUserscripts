@@ -1,1 +1,1 @@
-"Just some userscripts" 
+Just some userscripts
