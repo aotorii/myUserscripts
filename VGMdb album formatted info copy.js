@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VGMdb album formatted info copy
 // @namespace    https://vgmdb.net/
-// @version      0.9
+// @version      0.9.1
 // @description  Original: https://github.com/kahpaibe/userscripts
 // @author       kahpaibe
 // @match        https://vgmdb.net/album/*
