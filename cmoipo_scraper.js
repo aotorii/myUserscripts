@@ -2,15 +2,37 @@
 // @name         Comipo Scraper
 // @namespace    http://tampermonkey.net/
 // @version      0.9
-// @description  Turn pages manually.
+// @description  Turn pages manually
 // @author       You
 // @match        https://play.comipo.app/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // ==/UserScript==
 
-(function() {
+
+// Run this in console if you would like to auto turn pages
+
+// const nav = getEventListeners(window).keydown[2].listener;
+// let lastSrc = window._getCurrentImg()?.src;
+// window._autoTurn = setInterval(async () => {
+//     nav({ key: 'ArrowLeft' });
+//     await new Promise(r => setTimeout(r, 1500));
+//     const img = window._getCurrentImg();
+//     if (!img) return;
+//     if (img.src === lastSrc) {
+//         clearInterval(window._autoTurn);
+//         console.log('Last page reached');
+//         return;
+//     }
+//     lastSrc = img.src;
+// }, 2000);
+
+(function () {
     'use strict';
+
+    window._getCurrentImg = null;
+    window._savePage = null;
+
     const btn = document.createElement('button');
 
     setTimeout(() => {
@@ -29,10 +51,15 @@
 
         const dirHandle = await window.showDirectoryPicker();
 
+        const stopBtn = document.createElement('button');
+        stopBtn.innerText = 'Stop';
+        stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
+        document.body.appendChild(stopBtn);
+
         const getCurrentImg = () => {
             const imgs = [...document.querySelectorAll('img')]
-            // .filter(i => i.width === 551 && i.height === 784)
-            ;
+                .filter(i => i.naturalWidth >= 500 && i.naturalHeight >= 1000)
+                ;
 
             if (imgs.length === 0) return null;
 
@@ -66,27 +93,14 @@
             });
         };
 
+        window._getCurrentImg = getCurrentImg;
+        window._savePage = savePage;
+
         if (window._observer) {
             window._observer.disconnect();
         }
 
         await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // window._observer = new MutationObserver(() => {
-        //     if (saving) return;
-        //     const current = getCurrentImg();
-        //     if (!current || current.src === lastSrc) return;
-
-        //     saving = true;
-        //     lastSrc = current.src;
-
-        //     setTimeout(async () => {
-        //         const img = getCurrentImg();
-        //         if (!img) { saving = false; return; }
-        //         await savePage(img);
-        //         saving = false;
-        //     }, 500);
-        // });
 
         window._observer = new MutationObserver(() => {
             if (saving) return;
@@ -110,5 +124,17 @@
         lastSrc = first.src;
         await savePage(first);
 
+        stopBtn.onclick = () => {
+            stopBtn.remove();
+            if (window._observer) {
+                window._observer.disconnect();
+                console.log('Observer stopped');
+            }
+            if (window._autoTurn) {
+                clearInterval(window._autoTurn);
+                console.log('autoTurn stopped');
+            }
+        };
     };
 })();
+

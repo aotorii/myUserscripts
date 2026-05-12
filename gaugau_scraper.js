@@ -2,7 +2,7 @@
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
 // @version      0.9
-// @description  Remember to switch to fullscreen mode on the viewer page and use leftarrow key to turn pages.
+// @description  Remember to switch to fullscreen mode on the viewer page and use leftarrow key to turn pages manually
 // @author       You
 // @match        https://gaugau.futabanet.jp/list/work/*/episodes/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -21,7 +21,7 @@
 
     const btn = document.createElement('button');
     btn.innerText = 'Start Scraper';
-    btn.style.cssText = 'position:fixed;top:20px;left:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#4CAF50;color:white;border:none;border-radius:8px;';
+    btn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#4CAF50;color:white;border:none;border-radius:8px;';
     document.body.appendChild(btn);
 
     btn.onclick = async () => {
@@ -36,12 +36,10 @@
 
         dirHandle = await window.showDirectoryPicker();
 
-        // const getViewerWidth = () => {
-        //     const viewer = document.querySelector('.viewer')
-        //         || document.querySelector('[class*="viewer"]')
-        //         || document.querySelector('[class*="reader"]');
-        //     return viewer ? viewer.getBoundingClientRect().width : window.innerWidth;
-        // };
+        const stopBtn = document.createElement('button');
+        stopBtn.innerText = 'Stop';
+        stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
+        document.body.appendChild(stopBtn);
 
         const getSpreadLeftValues = () => {
             const imgs = [...document.querySelectorAll('img')]
@@ -113,63 +111,6 @@
             isSaving = false;
         };
 
-        // const getFingerprint = () => {
-        //     const imgs = [...document.querySelectorAll('img')]
-        //         .filter(i => i.naturalWidth === 1126 && i.naturalHeight === 536);
-
-        //     const leftValues = getSpreadLeftValues();
-        //     if (leftValues.length === 0) return null;
-
-        //     const firstStrip = imgs.find(i =>
-        //         Math.round(i.getBoundingClientRect().left) === leftValues[0]
-        //     );
-        //     if (!firstStrip) return null;
-
-        //     const canvas = document.createElement('canvas');
-        //     canvas.width = firstStrip.naturalWidth;
-        //     canvas.height = firstStrip.naturalHeight;
-        //     canvas.getContext('2d').drawImage(firstStrip, 0, 0);
-        //     const ctx = canvas.getContext('2d');
-
-        //     const points = [
-        //         [100, 100], [300, 200], [500, 300],
-        //         [700, 100], [900, 400], [200, 450],
-        //         [600, 50], [1000, 250]
-        //     ];
-
-        //     return points.map(([x, y]) => {
-        //         const d = ctx.getImageData(x, y, 1, 1).data;
-        //         return `${d[0]},${d[1]},${d[2]}`;
-        //     }).join('|');
-        // };
-
-        // const isBlank = (fingerprint) => {
-        //     const values = fingerprint.split('|').map(p => p.split(',').map(Number));
-        //     const zeroCount = values.filter(([r]) => r === 0 || r === 255).length;
-        //     return zeroCount > 5; // mostly black or white = still loading
-        // };
-
-        // let lastFP = getFingerprint();
-        // let lastSaveTime = 0;
-
-        // window._observer = setInterval(() => {
-        //     if (saving) return;
-
-        //     if (Date.now() - lastSaveTime < 2000) return;
-
-        //     const current = getFingerprint();
-        //     if (!current || current === lastFP) return;
-        //     if (isBlank(current)) return;
-
-        //     saving = true;
-        //     lastFP = current;
-
-        //     setTimeout(async () => {
-        //         await saveCurrentPages();
-        //         lastSaveTime = Date.now();
-        //     }, 500);
-        // }, 100);
-
         if (window._keyListener) {
             document.removeEventListener('keydown', window._keyListener, true);
         }
@@ -191,6 +132,14 @@
         }
         isSaving = false;
 
-        // await saveCurrentPages();
+        stopBtn.onclick = () => {
+            stopBtn.remove();
+            if (window._keyListener) {
+                document.removeEventListener('keydown', window._keyListener, false);
+                window._keyListener = null;
+                console.log('Listener stopped');
+            }
+        };
+
     };
 })();
