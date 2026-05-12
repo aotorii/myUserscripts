@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.9.1
 // @description  Remember to switch to fullscreen mode on the viewer page and use leftarrow key to turn pages manually
 // @author       You
 // @match        https://gaugau.futabanet.jp/list/work/*/episodes/*
