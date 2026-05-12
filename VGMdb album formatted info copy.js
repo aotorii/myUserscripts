@@ -51,7 +51,7 @@
           `[${albuminfo["Release Date"]
             ? albuminfo["Release Date"].replace(/\./g, "").slice(2).split(" ")[0]
             : "N/A"}][${albuminfo["Catalog Number"] && albuminfo["Catalog Number"] != "N/A"
-              ? albuminfo["Catalog Number"]
+              ? albuminfo["Catalog Number"].split(" ")[0]
               : "N/A"}]`
         );
         // if (
