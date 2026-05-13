@@ -45,7 +45,7 @@
         btn.remove();
 
         const title = prompt('Episode');
-        let pageNum = '1';
+        let pageNum = 1;
         let lastSrc = null;
         let saving = false;
 

@@ -56,7 +56,7 @@
         result += `${title_list.join("")}[${albuminfo["Catalog Number"] && albuminfo["Catalog Number"] != "N/A"
           ? albuminfo["Catalog Number"].split(" ")[0]
           : "N/A"}][FLAC+CUE+LOG]`;
-        result += `\n| 自购自抓 | CD / Lossless / Log (100%) / Cue`;
+        result += `\n|  | CD / Lossless / Log (100%) / Cue`;
         return result;
       },
       color: "#09ff00",
