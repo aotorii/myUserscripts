@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.9
 // @description  Turn pages manually
-// @author       you
+// @author       You
 // @match        https://firecross.jp/reader/*
 // @grant        none
 // @run-at       document-start
@@ -77,8 +77,8 @@
             const shNum = Math.sqrt(scrambleTable.length);
             const tileW = Math.floor(Math.floor(img.width / swNum) / 8) * 8;
             const tileH = Math.floor(Math.floor(img.height / shNum) / 8) * 8;
-
-            console.log(`tileW:${tileW} tileH:${tileH} swNum:${swNum} shNum:${shNum}`);
+            const coveredW = tileW * swNum;
+            const coveredH = tileH * shNum;
 
             const src = document.createElement('canvas');
             src.width = img.width;
@@ -98,6 +98,8 @@
               ctx.drawImage(src, srcX, srcY, tileW, tileH, dstX, dstY, tileW, tileH);
             });
 
+            ctx.drawImage(src, coveredW, 0, img.width - coveredW, img.height, coveredW, 0, img.width - coveredW, img.height);
+            ctx.drawImage(src, 0, coveredH, coveredW, img.height - coveredH, 0, coveredH, coveredW, img.height - coveredH);
             resolve(dst.toDataURL('image/jpeg', 0.95));
           };
           img.src = imageDataUrl;
