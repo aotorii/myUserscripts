@@ -28,7 +28,8 @@ window._autoTurn = setInterval(async () => {
 }, 2000);
 ```
 
-## Firecorss scraper
+## Firecross scraper
+Same as above.
 
 ```javascript
 const nav = getEventListeners(window).keydown
