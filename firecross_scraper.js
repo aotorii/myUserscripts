@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Firecross Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.9.1
 // @description  Turn pages manually
 // @author       You
 // @match        https://firecross.jp/reader/*
