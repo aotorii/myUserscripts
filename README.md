@@ -27,3 +27,21 @@ window._autoTurn = setInterval(async () => {
     lastSrc = img.src;
 }, 2000);
 ```
+
+## Firecorss scraper
+
+```javascript
+const nav = getEventListeners(window).keydown
+  .find(l => l.listener.toString().includes('actionArrowKey'))
+  ?.listener;
+
+window._autoTurn = setInterval(async () => {
+  nav({ key: 'ArrowLeft', stopPropagation: () => {}, preventDefault: () => {} });
+  await new Promise(r => setTimeout(r, 3000));
+  const changed = await window._waitForPageChange();
+  if (!changed) {
+    clearInterval(window._autoTurn);
+    console.log('Last page reached');
+  }
+}, 3500);
+```
