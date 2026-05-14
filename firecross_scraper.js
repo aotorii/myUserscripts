@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Firecross Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @description  Turn pages manually
 // @author       You
 // @match        https://firecross.jp/reader/*
@@ -9,11 +9,13 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function() {
+(function () {
   'use strict';
 
   const _origFetch = window.fetch.bind(window);
-  window.fetch = async function(...args) {
+  window._waitForPageChange = null;
+
+  window.fetch = async function (...args) {
     const res = await _origFetch(...args);
     try {
       const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
@@ -34,7 +36,7 @@
           }
         });
       }
-    } catch(e) {
+    } catch (e) {
       console.error('fetch intercept error:', e);
     }
     return res;
@@ -42,7 +44,7 @@
 
   const _origImageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
   Object.defineProperty(HTMLImageElement.prototype, 'src', {
-    set: function(url) {
+    set: function (url) {
       if (typeof url === 'string' && url.includes('diazepam_hybrid.php')) {
         const params = new URLSearchParams(url.split('?')[1]);
         const mode = params.get('mode');
@@ -61,12 +63,35 @@
       }
       _origImageSrc.set.call(this, url);
     },
-    get: function() {
+    get: function () {
       return _origImageSrc.get.call(this);
     }
   });
 
+  const waitForPageChange = () => new Promise(resolve => {
+    const beforeCount = Object.keys(window._binFiles || {}).length;
+    const beforeTables = Object.keys(window._scrambleTables || {}).length;
+    const start = Date.now();
+
+    const check = setInterval(() => {
+      const afterCount = Object.keys(window._binFiles || {}).length;
+      const afterTables = Object.keys(window._scrambleTables || {}).length;
+
+      if (afterCount > beforeCount || afterTables > beforeTables) {
+        clearInterval(check);
+        resolve(true);
+      }
+
+      if (Date.now() - start > 5000) {
+        clearInterval(check);
+        resolve(false);
+      }
+    }, 100);
+  });
+
   window.addEventListener('load', () => {
+    window._waitForPageChange = waitForPageChange;
+
     setTimeout(() => {
 
       const unscramble = (imageDataUrl, scrambleTable) => {
