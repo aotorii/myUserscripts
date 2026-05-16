@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @description  Remember to switch to fullscreen mode on the viewer page and use leftarrow key to turn pages manually
 // @author       You
 // @match        https://gaugau.futabanet.jp/list/work/*/episodes/*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // ==/UserScript==
 
@@ -30,7 +29,6 @@
         const title = prompt('Episode');
         let pageNum = 1;
         let lastSrcs = [];
-        // let saving = false;
         let dirHandle = null;
         let isSaving = false;
 
@@ -39,6 +37,7 @@
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
         stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
+
         document.body.appendChild(stopBtn);
 
         const getSpreadLeftValues = () => {
@@ -111,6 +110,26 @@
             isSaving = false;
         };
 
+        window._saveCurrentPages = saveCurrentPages;
+        window._getCurrentPages = getCurrentPages;
+        Object.defineProperty(window, '_isSaving', { get: () => isSaving });
+
+        window._waitForPageChange = () => new Promise(resolve => {
+            const before = getCurrentPages().map(p => p.src).join(',');
+            const start = Date.now();
+            const check = setInterval(() => {
+                const current = getCurrentPages().map(p => p.src).join(',');
+                if (current !== before) {
+                    clearInterval(check);
+                    resolve(true);
+                }
+                if (Date.now() - start > 5000) {
+                    clearInterval(check);
+                    resolve(false);
+                }
+            }, 100);
+        });
+
         if (window._keyListener) {
             document.removeEventListener('keydown', window._keyListener, true);
         }
@@ -139,7 +158,10 @@
                 window._keyListener = null;
                 console.log('Listener stopped');
             }
+            if (window._autoTurn) {
+                clearInterval(window._autoTurn);
+                console.log('autoTurn stopped');
+            }
         };
-
     };
 })();

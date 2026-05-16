@@ -35,7 +35,6 @@ Same as above.
 const nav = getEventListeners(window).keydown
   .find(l => l.listener.toString().includes('actionArrowKey'))
   ?.listener;
-
 window._autoTurn = setInterval(async () => {
   nav({ key: 'ArrowLeft', stopPropagation: () => {}, preventDefault: () => {} });
   await new Promise(r => setTimeout(r, 3000));
@@ -45,4 +44,23 @@ window._autoTurn = setInterval(async () => {
     console.log('Last page reached');
   }
 }, 3500);
+```
+
+## Gaugau scraper
+Same as comipo scraper.
+
+```javascript
+window._autoTurn = setInterval(async () => {
+  __sreaderFunc__.keyDown({ 
+    keyCode: 37, charCode: 0, shiftKey: false,
+    preventDefault: () => {}, stopPropagation: () => {}
+  });
+  const changed = await window._waitForPageChange();
+  if (!changed) {
+    clearInterval(window._autoTurn);
+    console.log('Last page reached');
+    return;
+  }
+  await window._saveCurrentPages();
+}, 3000);
 ```
