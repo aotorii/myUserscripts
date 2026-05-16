@@ -112,7 +112,6 @@
 
         window._saveCurrentPages = saveCurrentPages;
         window._getCurrentPages = getCurrentPages;
-        Object.defineProperty(window, '_isSaving', { get: () => isSaving });
 
         window._waitForPageChange = () => new Promise(resolve => {
             const before = getCurrentPages().map(p => p.src).join(',');
