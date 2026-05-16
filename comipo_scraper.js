@@ -5,33 +5,12 @@
 // @description  Turn pages manually
 // @author       You
 // @match        https://play.comipo.app/*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
+// @run-at       document-start
 // ==/UserScript==
-
-
-// Run this in console if you would like to auto turn pages
-
-// const nav = getEventListeners(window).keydown[2].listener;
-// let lastSrc = window._getCurrentImg()?.src;
-// window._autoTurn = setInterval(async () => {
-//     nav({ key: 'ArrowLeft' });
-//     await new Promise(r => setTimeout(r, 1500));
-//     const img = window._getCurrentImg();
-//     if (!img) return;
-//     if (img.src === lastSrc) {
-//         clearInterval(window._autoTurn);
-//         console.log('Last page reached');
-//         return;
-//     }
-//     lastSrc = img.src;
-// }, 2000);
 
 (function () {
     'use strict';
-
-    window._getCurrentImg = null;
-    window._savePage = null;
 
     const btn = document.createElement('button');
 
