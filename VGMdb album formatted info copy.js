@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VGMdb album formatted info copy
 // @namespace    https://vgmdb.net/
-// @version      0.9.2
+// @version      0.9.3
 // @description  Original: https://github.com/kahpaibe/userscripts
 // @author       kahpaibe
 // @match        https://vgmdb.net/album/*
@@ -111,7 +111,7 @@
           // title_list.push(`${artist} —`);
           title_list.push(`${artist} -`);
         }
-        const title_text = titles.length > 1 ? titles.slice(1).join("/") : titles[0];
+        const title_text = (titles.length > 1 ? titles.slice(1).join("／") : titles[0]).replace(/\//g, "／");
         title_list.push(title_text.replace(/⎘/g, "").trim());
         // title_list.push(`${titles.length > 1 ? titles.slice(1).join("/") : titles[0]}`);
         // if (
