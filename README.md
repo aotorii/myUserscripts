@@ -12,7 +12,9 @@ Author: [kahpaibe](https://github.com/kahpaibe/userscripts/tree/main)
 Run this in console if you would like to auto turn pages. Adjust the interval based on your network status.
 
 ```javascript
-const nav = getEventListeners(window).keydown[2].listener;
+const nav = getEventListeners(window).keydown
+  .find(l => l.listener.toString().includes('ArrowLeft') && l.listener.toString().includes('pageIndexDispatch'))
+  ?.listener;
 let lastSrc = window._getCurrentImg()?.src;
 window._autoTurn = setInterval(async () => {
     nav({ key: 'ArrowLeft' });
