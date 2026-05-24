@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Firecross Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.2
+// @version      0.9.3
 // @description  Turn pages manually
 // @author       You
 // @match        https://firecross.jp/reader/*
@@ -56,7 +56,7 @@
             canvas.height = this.naturalHeight;
             canvas.getContext('2d').drawImage(this, 0, 0);
             window._binFiles = window._binFiles || {};
-            window._binFiles[file] = canvas.toDataURL('image/jpeg', 1.0);
+            window._binFiles[file] = canvas.toDataURL('image/png');
             console.log(`Captured: ${file}`);
           }, { once: true });
         }
@@ -125,7 +125,7 @@
 
             ctx.drawImage(src, coveredW, 0, img.width - coveredW, img.height, coveredW, 0, img.width - coveredW, img.height);
             ctx.drawImage(src, 0, coveredH, coveredW, img.height - coveredH, 0, coveredH, coveredW, img.height - coveredH);
-            resolve(dst.toDataURL('image/jpeg', 0.95));
+            resolve(dst.toDataURL('image/png'));
           };
           img.src = imageDataUrl;
         });
@@ -183,7 +183,7 @@
           }
 
           const unscrambled = await unscramble(binFiles[file], table);
-          const filename = `${title}_${String(pageNum).padStart(3, '0')}.jpg`;
+          const filename = `${title}_${String(pageNum).padStart(3, '0')}.png`;
           await saveBlob(dirHandle, filename, unscrambled);
           pageNum++;
         }
