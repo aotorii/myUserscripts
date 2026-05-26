@@ -66,3 +66,6 @@ window._autoTurn = setInterval(async () => {
   await window._saveCurrentPages();
 }, 3000);
 ```
+
+## Magapoke scraper
+Check [haruneko](https://github.com/manga-download/haruneko)
