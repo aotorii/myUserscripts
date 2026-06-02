@@ -48,13 +48,14 @@ window._autoTurn = setInterval(async () => {
 }, 3500);
 ```
 
-## Gaugau scraper
-Same as comipo scraper.
+## Gaugau/Cmoa scraper
+These two use same approaches to extract whole pages from blobs.
 
 ```javascript
 window._autoTurn = setInterval(async () => {
   __sreaderFunc__.keyDown({ 
     keyCode: 37, charCode: 0, shiftKey: false,
+    target: document.body,
     preventDefault: () => {}, stopPropagation: () => {}
   });
   const changed = await window._waitForPageChange();
