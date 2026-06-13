@@ -153,7 +153,7 @@
                 c.dest.x * dims.width, c.dest.y * dims.height, dims.width, dims.height
             );
         }
-        return canvas.convertToBlob({type: 'image/png'});
+        return canvas.convertToBlob({ type: 'image/png' });
     };
 
     const saveBlob = async (dirHandle, filename, blob) => {
@@ -161,7 +161,7 @@
         const writable = await fileHandle.createWritable();
         await writable.write(blob);
         await writable.close();
-        console.log(`✅ Saved ${filename}`);
+        console.log(`Saved ${filename}`);
     };
 
     const fetchImage = (url) => new Promise((resolve, reject) => {

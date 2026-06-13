@@ -65,7 +65,7 @@
                     const writable = await fileHandle.createWritable();
                     await writable.write(blob);
                     await writable.close();
-                    console.log(`✅ Saved ${filename}`);
+                    console.log(`Saved ${filename}`);
                     pageNum++;
                     resolve();
                 }, 'image/png');
