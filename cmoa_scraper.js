@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Cmoa Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.0
+// @version      0.9.1
 // @description  test
 // @author       You
 // @match        https://www.cmoa.jp/bib/speedreader*
+// @match        https://yanmaga.jp/viewer/comics/*
 // @grant        none
 // ==/UserScript==
 
