@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Magapoke Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.9.1
 // @description  haruneko
 // @author       haruneko
 // @match        https://pocket.shonenmagazine.com/title/*/episode/*
