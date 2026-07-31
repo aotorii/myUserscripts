@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Gaugau-like Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.2
-// @description  Scraper for manga viewers similar to gaugau, the ones I've found so far: cmoa, yanmaga.
+// @version      0.9.3
+// @description  Scraper for manga viewers similar to gaugau, the ones I've found so far: cmoa, yanmaga, 123hon
 // @author       You
 // @match        https://www.cmoa.jp/bib/speedreader*
 // @match        https://yanmaga.jp/viewer/comics/*
+// @match        https://www.123hon.com/vw/*
 // @grant        none
 // ==/UserScript==
 
