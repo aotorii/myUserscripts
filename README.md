@@ -70,3 +70,12 @@ window._autoTurn = setInterval(async () => {
 
 ## Magapoke scraper
 Check [haruneko](https://github.com/manga-download/haruneko)
+
+## DMM scraper
+Run this in console to start the scraper.
+
+```javascript
+_dmmScraper.scrapeAll()
+```
+
+If you find the saved images are all scrambled without throwing any error, this means DMM has just updated its viewer bundle, in which case the descramble tile math the scraper is using needs to be updated accordingly. A cat-and-mouse game with nothing critical, until the next time DMM restructures and breaks the whole thing as always.
