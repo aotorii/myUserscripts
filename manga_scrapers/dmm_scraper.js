@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DMM Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.0
+// @version      0.9.1
 // @author       You
 // @match        https://book.dmm.com/*
 // @match        https://book.dmm.co.jp/*
@@ -24,7 +24,8 @@
       res.clone().json().then(data => {
         if (data.status === '200' && data.url) {
           unsafeWindow._lastBaseUrl = data.url;
-          console.log('Captured base URL:', data.url);
+          unsafeWindow._lastContentType = data.cty;
+          console.log('Captured base URL:', data.url, '(contentType:', data.cty, ')');
         } else {
           console.warn('Auth response missing expected fields:', data);
         }
@@ -47,8 +48,18 @@
     });
   }
 
-  async function fetchManifest(baseUrl) {
-    const res = await fetch(baseUrl + "configuration_pack.json", { credentials: 'include' });
+  function getContentSubfolderUrl(baseUrl, contentType, fontSize) {
+    // contentType 0 = EPUB reflow (novels) — manifest lives under a fontSize subfolder
+    // any other contentType (e.g. 1 = fixed-layout comics) — manifest is at baseUrl directly
+    if (contentType === 0) {
+      const size = fontSize || 'normal';
+      return baseUrl + size + '_default/';
+    }
+    return baseUrl;
+  }
+
+  async function fetchManifest(contentUrl) {
+    const res = await fetch(contentUrl + "configuration_pack.json", { credentials: 'include' });
     if (!res.ok) throw new Error(`Manifest fetch failed: HTTP ${res.status}`);
     return res.json();
   }
@@ -129,16 +140,19 @@
     return outCanvas;
   }
 
-  async function scrapeAll(baseUrl) {
+  async function scrapeAll(baseUrl, contentType, fontSize) {
     baseUrl = baseUrl || unsafeWindow._lastBaseUrl;
+    contentType = contentType !== undefined ? contentType : unsafeWindow._lastContentType;
     if (!baseUrl) {
-      console.error('No base URL available. Reload the reader page first (to capture it), or pass one explicitly.');
+      console.error('No base URL available. Reload the reader page first, or pass one explicitly.');
       return;
     }
-    console.log('Using base URL:', baseUrl);
+
+    const contentUrl = getContentSubfolderUrl(baseUrl, contentType, fontSize);
+    console.log('Using content URL:', contentUrl);
     console.log('Fetching manifest...');
-    const cfg = await fetchManifest(baseUrl);
-    const pages = buildPageList(cfg, baseUrl);
+    const cfg = await fetchManifest(contentUrl);
+    const pages = buildPageList(cfg, contentUrl);
     console.log(`Found ${pages.length} pages`);
 
     const dirHandle = await window.showDirectoryPicker();
