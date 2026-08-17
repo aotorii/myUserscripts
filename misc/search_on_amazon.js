@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Search in Amazon
+// @name         Search on Amazon
 // @namespace    http://tampermonkey.net/
 // @version      0.9.0
-// @description  Add a button to search BW items in Amazon
+// @description  Add a button to search BW items on Amazon
 // @author       You
 // @match        https://bookwalker.jp/de*
 // @grant        none
