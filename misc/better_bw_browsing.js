@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better BW Browsing
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @description  Improve my BW browsing experience
 // @author       You
 // @match        https://bookwalker.jp/de*
@@ -19,10 +19,12 @@
         #js-ma-floating-banner,
         .t-c-banner-slider,
         .t-p-detail__ma-embed,
-        .t-c-detail-app-induction {
+        .t-c-detail-app-induction,
+        .t-c-general-section.is-hidden {
             display: none !important;
         }
     `;
+
     document.documentElement.appendChild(style);
 
     function addSearchButton() {
@@ -66,6 +68,16 @@
 
     function init() {
         addSearchButton();
+
+        document.querySelectorAll('.t-c-general-section').forEach(section => {
+            const title = section.querySelector('.t-o-heading-single');
+            if ([
+                'おすすめ作品特集',
+                'BOOK☆WALKERの楽しみ方'
+            ].includes(title?.textContent.trim())) {
+                section.classList.add('is-hidden');
+            }
+        });
     }
 
     if (document.readyState === 'loading') {
