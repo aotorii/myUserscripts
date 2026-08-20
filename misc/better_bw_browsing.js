@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better BW Browsing
 // @namespace    http://tampermonkey.net/
-// @version      0.9.0
+// @version      0.9.1
 // @description  Improve my BW browsing experience
 // @author       You
 // @match        https://bookwalker.jp/de*
@@ -18,7 +18,7 @@
         #js-lazy-campaign-popup,
         #js-ma-floating-banner,
         .t-c-banner-slider,
-        .t-p-detail__ma-embed
+        .t-p-detail__ma-embed,
         .t-c-detail-app-induction {
             display: none !important;
         }
