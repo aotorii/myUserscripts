@@ -1,16 +1,29 @@
 // ==UserScript==
-// @name         Search on Amazon
+// @name         Better BW Browsing
 // @namespace    http://tampermonkey.net/
 // @version      0.9.0
-// @description  Add a button to search BW items on Amazon
+// @description  Improve my BW browsing experience
 // @author       You
 // @match        https://bookwalker.jp/de*
 // @grant        none
-// @run-at       document-idle
+// @run-at       document-start
 // ==/UserScript==
 
 (function () {
     'use strict';
+
+    // Hide campaign elements
+    const style = document.createElement('style');
+    style.textContent = `
+        #js-lazy-campaign-popup,
+        #js-ma-floating-banner,
+        .t-c-banner-slider,
+        .t-p-detail__ma-embed
+        .t-c-detail-app-induction {
+            display: none !important;
+        }
+    `;
+    document.documentElement.appendChild(style);
 
     function addSearchButton() {
         const titleElement = document.querySelector('h1.t-c-product-main-data__title')
@@ -50,5 +63,14 @@
         });
         titleElement.appendChild(button);
     }
-    addSearchButton();
+
+    function init() {
+        addSearchButton();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
