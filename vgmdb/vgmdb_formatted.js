@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VGMdb album formatted info copy
 // @namespace    https://vgmdb.net/
-// @version      0.9.3
+// @version      0.9.4
 // @description  Original: https://github.com/kahpaibe/userscripts
 // @author       kahpaibe
 // @match        https://vgmdb.net/album/*
@@ -15,52 +15,54 @@
   // Global button settings
   const albummetadataButtonSettings = [
     // {title: "...", tooltip: "...", formatFunction: (url, coverurl, titles, notes, links, albuminfo, credits, tracklists) => {...}, [color: "..."]}
-    {
-      title: "test",
-      tooltip: "torrentName",
-      formatFunction: (
-        url,
-        coverurl,
-        titles,
-        notes,
-        links,
-        albuminfo,
-        credits,
-        tracklists,
-      ) => {
-        let result = "";
-        let title_list = [];
-        let artist_0 = null;
 
-        ["Publisher", "Label", "Distributor"].forEach((role_guess) => {
-          // Role priority
-          if (albuminfo && albuminfo[role_guess]) {
-            artist_0 = albuminfo[role_guess];
-            return;
-          }
-        });
+    // For test, uncomment if necessary
+    // {
+    //   title: "test",
+    //   tooltip: "torrentName",
+    //   formatFunction: (
+    //     url,
+    //     coverurl,
+    //     titles,
+    //     notes,
+    //     links,
+    //     albuminfo,
+    //     credits,
+    //     tracklists,
+    //   ) => {
+    //     let result = "";
+    //     let title_list = [];
+    //     let artist_0 = null;
 
-        title_list.push(
-          `[EAC][${albuminfo["Release Date"]
-            ? albuminfo["Release Date"].replace(/\./g, "").slice(2).split(" ")[0]
-            : "N/A"}][OST]`
-        );
+    //     ["Publisher", "Label", "Distributor"].forEach((role_guess) => {
+    //       // Role priority
+    //       if (albuminfo && albuminfo[role_guess]) {
+    //         artist_0 = albuminfo[role_guess];
+    //         return;
+    //       }
+    //     });
 
-        const artist = artist_0 ? (artist_0.split(" / ")[1] || artist_0.split(" / ")[0]) : null;
-        if (artist) {
-          title_list.push(`[${artist}]`);
-        }
-        const title_text = titles.length > 1 ? titles.slice(1).join("/") : titles[0];
-        title_list.push(`[${title_text.replace(/⎘/g, "").trim()}]`);
+    //     title_list.push(
+    //       `[EAC][${albuminfo["Release Date"]
+    //         ? albuminfo["Release Date"].replace(/\./g, "").slice(2).split(" ")[0]
+    //         : "N/A"}][OST]`
+    //     );
 
-        result += `${title_list.join("")}[${albuminfo["Catalog Number"] && albuminfo["Catalog Number"] != "N/A"
-          ? albuminfo["Catalog Number"].split(" ")[0]
-          : "N/A"}][FLAC+CUE+LOG]`;
-        result += `\n|  | CD / Lossless / Log (100%) / Cue`;
-        return result;
-      },
-      color: "#09ff00",
-    },
+    //     const artist = artist_0 ? (artist_0.split(" / ")[1] || artist_0.split(" / ")[0]) : null;
+    //     if (artist) {
+    //       title_list.push(`[${artist}]`);
+    //     }
+    //     const title_text = titles.length > 1 ? titles.slice(1).join("/") : titles[0];
+    //     title_list.push(`[${title_text.replace(/⎘/g, "").trim()}]`);
+
+    //     result += `${title_list.join("")}[${albuminfo["Catalog Number"] && albuminfo["Catalog Number"] != "N/A"
+    //       ? albuminfo["Catalog Number"].split(" ")[0]
+    //       : "N/A"}][FLAC+CUE+LOG]`;
+    //     result += `\n|  | CD / Lossless / Log (100%) / Cue`;
+    //     return result;
+    //   },
+    //   color: "#09ff00",
+    // },
     {
       title: "Copy folder name",
       tooltip: "Copy folder name to clipboard",
