@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Comipo Scraper (Firefox)
+// @name         Manga-one Scraper (Firefox)
 // @namespace    http://tampermonkey.net/
 // @version      0.9.0
-// @description  One-page mode
+// @description  Scraper for manga-one
 // @author       You
-// @match        https://play.comipo.app/*
+// @match        https://manga-one.com/manga/*/chapter/*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
@@ -21,25 +21,32 @@
         btn.remove();
         const title = prompt('Episode');
         let pageNum = 1;
-        let lastSrc = null;
+        let lastPages = null;
         let saving = false;
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
         stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
         document.body.appendChild(stopBtn);
 
-        const getCurrentImg = () => {
+        const getSpreadLeftValues = () => {
             const imgs = [...document.querySelectorAll('img')]
-                .filter(i => i.naturalWidth >= 500 && i.naturalHeight >= 1000);
-            if (imgs.length === 0) return null;
-            const viewportCenter = window.innerWidth / 2;
-            return imgs.reduce((closest, img) => {
-                const rect = img.getBoundingClientRect();
-                const dist = Math.abs(rect.left + img.width / 2 - viewportCenter);
-                const closestRect = closest.getBoundingClientRect();
-                const closestDist = Math.abs(closestRect.left + closest.width / 2 - viewportCenter);
-                return dist < closestDist ? img : closest;
-            });
+                .filter(i => i.naturalWidth === 720 && i.naturalHeight === 1020);
+            return [...new Set(
+                imgs.map(i => Math.round(i.getBoundingClientRect().left))
+            )].filter(left => left >= 0 && left < window.innerWidth)
+                .sort((a, b) => a - b)
+                .slice(0, 2);
+        };
+
+        const getCurrentPages = () => {
+            const imgs = [...document.querySelectorAll('img')]
+                .filter(i => i.naturalWidth === 720 && i.naturalHeight === 1020);
+            const leftValues = getSpreadLeftValues().reverse();
+            return leftValues
+                .map(targetLeft =>
+                    imgs.find(i => Math.round(i.getBoundingClientRect().left) === targetLeft)
+                )
+                .filter(Boolean);
         };
 
         const savePage = (img) => {
@@ -65,7 +72,7 @@
             });
         };
 
-        window._getCurrentImg = getCurrentImg;
+        window._getCurrentPages = getCurrentPages;
         window._savePage = savePage;
 
         if (window._observer) {
@@ -78,10 +85,19 @@
             saving = true;
             setTimeout(async () => {
                 try {
-                    const current = getCurrentImg();
-                    if (!current || current.src === lastSrc) return;
-                    lastSrc = current.src;
-                    await savePage(current);
+                    const pages = getCurrentPages();
+                    if (pages.length === 0) return;
+
+                    const currentSrcs = pages.map(img => img.src);
+                    const same =
+                        currentSrcs.length === lastPages.length &&
+                        currentSrcs.every((src, i) => src === lastPages[i]);
+                    if (same) return;
+
+                    lastPages = currentSrcs;
+                    for (const img of pages) {
+                        await savePage(img);
+                    }
                 } finally {
                     saving = false;
                 }
@@ -90,10 +106,12 @@
 
         window._observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['src'] });
 
-        const first = getCurrentImg();
-        if (!first) { console.error('No image found'); return; }
-        lastSrc = first.src;
-        await savePage(first);
+        const first = getCurrentPages();
+        if (!first.length) { console.error('No image found'); return; }
+        lastPages = first.map(img => img.src);
+        for (const img of first) {
+            await savePage(img);
+        }
         stopBtn.onclick = () => {
             stopBtn.remove();
             if (window._observer) {

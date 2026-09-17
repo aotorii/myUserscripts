@@ -1,4 +1,4 @@
-Just some userscripts seasoned with my vibecoding. Chrome only.
+Just some userscripts seasoned with my vibecoding.
 
 ## VGMdb album formatted info copy
 
