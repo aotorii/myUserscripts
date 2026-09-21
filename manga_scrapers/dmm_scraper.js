@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DMM Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @author       You
 // @match        https://book.dmm.com/*
 // @match        https://book.dmm.co.jp/*
@@ -155,17 +155,19 @@
     const pages = buildPageList(cfg, contentUrl);
     console.log(`Found ${pages.length} pages`);
 
-    const dirHandle = await window.showDirectoryPicker();
     for (let i = 0; i < pages.length; i++) {
       try {
         const canvas = await captureAndDescramble(pages[i]);
         const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-        const fileHandle = await dirHandle.getFileHandle(
-          `image_${String(i + 1).padStart(3, '0')}.png`, { create: true }
-        );
-        const writable = await fileHandle.createWritable();
-        await writable.write(blob);
-        await writable.close();
+        const filename = `image_${String(i + 1).padStart(3, '0')}.png`;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
         console.log(`${i + 1}/${pages.length} — ${pages[i].label}`);
       } catch (e) {
         console.error(`page ${i + 1} (${pages[i].label}):`, e);

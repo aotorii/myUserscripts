@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Comipo Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
-// @description  Turn pages manually
+// @version      0.9.2
+// @description  One-page mode
 // @author       You
 // @match        https://play.comipo.app/*
 // @grant        none
@@ -11,25 +11,18 @@
 
 (function () {
     'use strict';
-
     const btn = document.createElement('button');
-
     setTimeout(() => {
         btn.innerText = 'Start Scraper';
         btn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#4CAF50;color:white;border:none;border-radius:8px;';
         document.body.appendChild(btn);
     }, 3000);
-
     btn.onclick = async () => {
         btn.remove();
-
         const title = prompt('Episode');
         let pageNum = 1;
         let lastSrc = null;
         let saving = false;
-
-        const dirHandle = await window.showDirectoryPicker();
-
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
         stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
@@ -37,11 +30,8 @@
 
         const getCurrentImg = () => {
             const imgs = [...document.querySelectorAll('img')]
-                .filter(i => i.naturalWidth >= 500 && i.naturalHeight >= 1000)
-                ;
-
+                .filter(i => i.naturalWidth >= 500 && i.naturalHeight >= 1000);
             if (imgs.length === 0) return null;
-
             const viewportCenter = window.innerWidth / 2;
             return imgs.reduce((closest, img) => {
                 const rect = img.getBoundingClientRect();
@@ -59,12 +49,15 @@
                 canvas.width = img.naturalWidth;
                 canvas.height = img.naturalHeight;
                 canvas.getContext('2d').drawImage(img, 0, 0);
-
                 canvas.toBlob(async (blob) => {
-                    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(blob);
-                    await writable.close();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
                     console.log(`Saved ${filename}`);
                     pageNum++;
                     resolve();
@@ -78,7 +71,6 @@
         if (window._observer) {
             window._observer.disconnect();
         }
-
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         window._observer = new MutationObserver(() => {
@@ -102,7 +94,6 @@
         if (!first) { console.error('No image found'); return; }
         lastSrc = first.src;
         await savePage(first);
-
         stopBtn.onclick = () => {
             stopBtn.remove();
             if (window._observer) {
@@ -116,4 +107,3 @@
         };
     };
 })();
-

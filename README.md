@@ -1,4 +1,4 @@
-Just some userscripts seasoned with my vibecoding.
+Just some userscripts seasoned with my vibecoding. Chrome/Firefox.
 
 ## VGMdb album formatted info copy
 
@@ -8,16 +8,23 @@ Author: [kahpaibe](https://github.com/kahpaibe/userscripts/tree/main)
 
 Author: [kahpaibe](https://github.com/kahpaibe/userscripts/tree/main)
 
-## Comipo scraper
-Run this in console if you would like to auto turn pages. Adjust the interval based on your network status.
+
+## Auto-turn pages for manga scrapers
+Run the following scripts in console (F12) if you would like to auto turn pages. Adjust the interval based on your network status.
+
+### Comipo scraper
 
 ```javascript
-const nav = getEventListeners(window).keydown
-  .find(l => l.listener.toString().includes('ArrowLeft') && l.listener.toString().includes('pageIndexDispatch'))
-  ?.listener;
 let lastSrc = window._getCurrentImg()?.src;
 window._autoTurn = setInterval(async () => {
-    nav({ key: 'ArrowLeft' });
+    window.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowLeft',
+        code: 'ArrowLeft',
+        keyCode: 37,
+        which: 37,
+        bubbles: true,
+        cancelable: true,
+    }));
     await new Promise(r => setTimeout(r, 1500));
     const img = window._getCurrentImg();
     if (!img) return;
@@ -30,15 +37,18 @@ window._autoTurn = setInterval(async () => {
 }, 2000);
 ```
 
-## Firecross scraper
-Same as above.
+### Firecross scraper
 
 ```javascript
-const nav = getEventListeners(window).keydown
-  .find(l => l.listener.toString().includes('actionArrowKey'))
-  ?.listener;
 window._autoTurn = setInterval(async () => {
-  nav({ key: 'ArrowLeft', stopPropagation: () => {}, preventDefault: () => {} });
+  window.dispatchEvent(new KeyboardEvent('keydown', {
+    key: 'ArrowLeft',
+    code: 'ArrowLeft',
+    keyCode: 37,
+    which: 37,
+    bubbles: true,
+    cancelable: true,
+  }));
   await new Promise(r => setTimeout(r, 3000));
   const changed = await window._waitForPageChange();
   if (!changed) {
@@ -48,8 +58,7 @@ window._autoTurn = setInterval(async () => {
 }, 3500);
 ```
 
-## Gaugau/Gaugau-like scraper
-These use the same approach to extract whole pages from blobs.
+### Gaugau scraper
 
 ```javascript
 window._autoTurn = setInterval(async () => {
@@ -65,6 +74,33 @@ window._autoTurn = setInterval(async () => {
     return;
   }
   await window._saveCurrentPages();
+}, 3000);
+```
+
+### Manga-one scraper
+
+```javascript
+let lastPages = window._getCurrentPages().map(img => img.src);
+window._autoTurn = setInterval(async () => {
+    window.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowLeft',
+        code: 'ArrowLeft',
+        keyCode: 37,
+        which: 37,
+        bubbles: true,
+        cancelable: true,
+    }));
+    await new Promise(r => setTimeout(r, 2000));
+    const pages = window._getCurrentPages();
+    if (!pages.length) return;
+    const currentPages = pages.map(img => img.src);
+    const same = currentPages.length === lastPages.length && currentPages.every((src, i) => src === lastPages[i]);
+    if (same) {
+        clearInterval(window._autoTurn);
+        console.log('Last page reached');
+        return;
+    }
+    lastPages = currentPages;
 }, 3000);
 ```
 

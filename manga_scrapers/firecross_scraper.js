@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Firecross Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.4
+// @version      0.9.5
 // @description  Turn pages manually
 // @author       You
 // @match        https://firecross.jp/reader/*
@@ -131,13 +131,17 @@
         });
       };
 
-      const saveBlob = async (dirHandle, filename, dataUrl) => {
+      const saveBlob = async (filename, dataUrl) => {
         const res = await fetch(dataUrl);
         const blob = await res.blob();
-        const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(blob);
-        await writable.close();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
         console.log(`Saved ${filename}`);
       };
 
@@ -150,8 +154,6 @@
         btn.remove();
 
         const title = prompt('Episode');
-
-        const dirHandle = await window.showDirectoryPicker();
 
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
@@ -184,7 +186,7 @@
 
           const unscrambled = await unscramble(binFiles[file], table);
           const filename = `${title}_${String(pageNum).padStart(3, '0')}.png`;
-          await saveBlob(dirHandle, filename, unscrambled);
+          await saveBlob(filename, unscrambled);
           pageNum++;
         }
         if (!stopped) {

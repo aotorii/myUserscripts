@@ -1,9 +1,12 @@
 // ==UserScript==
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.3
-// @description  Remember to switch to fullscreen mode on the viewer page and use leftarrow key to turn pages manually
+// @version      0.9.4
+// @description  Switch the reader to full-screen. Also supports: cmoa, yanmaga, 123hon
 // @author       You
+// @match        https://www.cmoa.jp/bib/speedreader*
+// @match        https://yanmaga.jp/viewer/comics/*
+// @match        https://www.123hon.com/vw/*
 // @match        https://gaugau.futabanet.jp/list/work/*/episodes/*
 // @grant        none
 // ==/UserScript==
@@ -11,12 +14,6 @@
 
 (function () {
     'use strict';
-
-    const match = location.pathname.match(/\/episodes\/(\d+)$/);
-
-    if (!match) {
-        return;
-    }
 
     const btn = document.createElement('button');
     btn.innerText = 'Start Scraper';
@@ -29,10 +26,7 @@
         const title = prompt('Episode');
         let pageNum = 1;
         let lastSrcs = [];
-        let dirHandle = null;
         let isSaving = false;
-
-        dirHandle = await window.showDirectoryPicker();
 
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
@@ -40,30 +34,69 @@
 
         document.body.appendChild(stopBtn);
 
+        const isTransparent = (img) => {
+            const canvas = document.createElement('canvas');
+            const sampleW = Math.min(img.naturalWidth, 100);
+            const sampleH = Math.min(img.naturalHeight, 100);
+            canvas.width = sampleW;
+            canvas.height = sampleH;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, sampleW, sampleH);
+            try {
+                const data = ctx.getImageData(0, 0, sampleW, sampleH).data;
+                let transparentCount = 0;
+                for (let i = 3; i < data.length; i += 4) { // alpha channel is every 4th byte
+                    if (data[i] < 250) transparentCount++;
+                }
+                const transparentRatio = transparentCount / (sampleW * sampleH);
+                return transparentRatio > 0.05;
+            } catch (e) {
+                console.warn('Could not sample alpha for', img.src, e);
+                return false;
+            }
+        };
+
         const getSpreadLeftValues = () => {
             const imgs = [...document.querySelectorAll('img')]
-                .filter(i => i.naturalWidth === 1126 && i.naturalHeight === 536);
+                .filter(i => i.naturalWidth >= 1100)
+                .filter(i => !isTransparent(i));
             return [...new Set(
                 imgs.map(i => Math.round(i.getBoundingClientRect().left))
-            )].filter(left => left >= 0 && left < window.innerWidth - 150)
+            )].filter(left => left >= 0 && left < window.innerWidth)
                 .sort((a, b) => a - b);
         };
 
 
         const stitchStrips = (strips) => {
-            const overlap = 4; // pixels to crop from bottom of each strip
-            const stripH = strips[0].naturalHeight;
             const stripW = strips[0].naturalWidth;
-            const totalHeight = stripH * strips.length - overlap * (strips.length - 1);
+            let totalHeight = 0;
+            strips.forEach((strip, i) => {
+                const rect = strip.getBoundingClientRect();
+                if (i < strips.length - 1) {
+                    const nextTop = strips[i + 1].getBoundingClientRect().top;
+                    const overlap = Math.round((rect.bottom - nextTop) * (strip.naturalHeight / strip.height));
+                    totalHeight += strip.naturalHeight - overlap;
+                }
+                else {
+                    totalHeight += strip.naturalHeight;
+                }
+            });
 
             const canvas = document.createElement('canvas');
             canvas.width = stripW;
             canvas.height = totalHeight;
             const ctx = canvas.getContext('2d');
 
+            let destY = 0;
             strips.forEach((strip, i) => {
-                const destY = i * (stripH - overlap);
+                const stripH = strip.naturalHeight;
                 ctx.drawImage(strip, 0, 0, stripW, stripH, 0, destY, stripW, stripH);
+                const rect = strip.getBoundingClientRect();
+                if (i < strips.length - 1) {
+                    const nextTop = strips[i + 1].getBoundingClientRect().top;
+                    const overlap = Math.round((rect.bottom - nextTop) * (strip.naturalHeight / strip.height));
+                    destY += stripH - overlap;
+                }
             });
 
             return canvas;
@@ -71,7 +104,8 @@
 
         const getCurrentPages = () => {
             const imgs = [...document.querySelectorAll('img')]
-                .filter(i => i.naturalWidth === 1126 && i.naturalHeight === 536);
+                .filter(i => i.naturalWidth >= 1100)
+                .filter(i => !isTransparent(i));
             const leftValues = getSpreadLeftValues().reverse();
             return leftValues.map(targetLeft => {
                 const strips = imgs
@@ -87,10 +121,14 @@
             return new Promise((resolve) => {
                 const filename = `${title}_${String(pageNum).padStart(3, '0')}.png`;
                 canvas.toBlob(async (blob) => {
-                    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(blob);
-                    await writable.close();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
                     console.log(`Saved ${filename}`);
                     pageNum++;
                     resolve();

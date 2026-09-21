@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Manga-one Scraper (Firefox)
+// @name         Manga-one Scraper
 // @namespace    http://tampermonkey.net/
 // @version      0.9.0
-// @description  Scraper for manga-one
+// @description  Same method with comipo but applied to spread mode
 // @author       You
 // @match        https://manga-one.com/manga/*/chapter/*
 // @grant        none
