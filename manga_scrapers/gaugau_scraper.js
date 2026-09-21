@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.4
+// @version      0.9.5
 // @description  Switch the reader to full-screen. Also supports: cmoa, yanmaga, 123hon
 // @author       You
 // @match        https://www.cmoa.jp/bib/speedreader*
