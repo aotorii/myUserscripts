@@ -59,7 +59,14 @@
         const getSpreadLeftValues = () => {
             const imgs = [...document.querySelectorAll('img')]
                 .filter(i => i.naturalWidth >= 1100)
-                .filter(i => !isTransparent(i));
+                .filter(i => !isTransparent(i))
+                .filter(i => {
+                    const rect = i.getBoundingClientRect();
+                    const visibleLeft = Math.max(rect.left, 0);
+                    const visibleRight = Math.min(rect.right, window.innerWidth);
+                    const visibleWidth = Math.max(0, visibleRight - visibleLeft);
+                    return visibleWidth / rect.width >= 0.99; // reject edge leaks
+                });
             return [...new Set(
                 imgs.map(i => Math.round(i.getBoundingClientRect().left))
             )].filter(left => left >= 0 && left < window.innerWidth)
