@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Better BW Browsing
 // @namespace    http://tampermonkey.net/
-// @version      0.9.3
+// @version      0.9.4
 // @description  Improve my BW browsing experience
 // @author       You
 // @match        https://bookwalker.jp/de*
@@ -57,7 +57,7 @@
             WebkitAppearance: 'none'
         });
         button.addEventListener('click', async () => {
-            const keywords = /電子|単行本|特典|特別版|イラスト/i;
+            const keywords = /電子|単行本|特典|特別版|イラスト|限定|オリジナル/i;
             const cleanTitle = title.replace(
                 /【[^】]*】|\[[^\]]*\]|［[^］]*］|（[^）]*）|\([^)]*\)|「[^」]*」|『[^』]*』/g,
                 match => keywords.test(match) ? '' : match

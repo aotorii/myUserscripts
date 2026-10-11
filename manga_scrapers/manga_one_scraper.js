@@ -17,12 +17,15 @@
         btn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#4CAF50;color:white;border:none;border-radius:8px;';
         document.body.appendChild(btn);
     }, 3000);
+
     btn.onclick = async () => {
         btn.remove();
+
         const title = prompt('Episode');
         let pageNum = 1;
         let lastPages = null;
         let saving = false;
+
         const stopBtn = document.createElement('button');
         stopBtn.innerText = 'Stop';
         stopBtn.style.cssText = 'position:fixed;bottom:60px;right:20px;z-index:99999;padding:10px 20px;font-size:16px;cursor:pointer;background:#f44336;color:white;border:none;border-radius:8px;';
