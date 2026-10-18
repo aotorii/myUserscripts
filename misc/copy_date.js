@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DMM Copy Date
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @description  Add a button to copy the release date as YYMMDD format
 // @author       You
 // @match        https://www.dmm.co.jp/dc/doujin/-/detail/=/*
@@ -15,17 +15,18 @@
 
     function addCopyButton() {
         const isDoujin = location.hostname === 'www.dmm.co.jp';
-        let dateElement;
+        let dateElement, title;
 
         if (isDoujin) {
-            const title = [...document.querySelectorAll('.informationList__ttl')]
+            title = [...document.querySelectorAll('.informationList__ttl')]
                 .find(el => el.textContent.trim() === '配信開始日');
             if (!title) return;
             dateElement = title.nextElementSibling;
         } else {
-            dateElement = document.querySelector(
-                'span[data-testid="volume-detail-info-content-publish-date"]'
-            );
+            title = [...document.querySelectorAll('dt[class^="sc-"]')]
+                .find(el => el.textContent.trim() === '配信開始日')
+            if (!title) return;
+            dateElement = title.nextElementSibling;
         }
 
         if (!dateElement) return;
