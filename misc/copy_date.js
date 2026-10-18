@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         DMM Copy Date
 // @namespace    http://tampermonkey.net/
-// @version      0.9.0
+// @version      0.9.1
 // @description  Add a button to copy the release date as YYMMDD format
 // @author       You
 // @match        https://www.dmm.co.jp/dc/doujin/-/detail/=/*
+// @match        https://book.dmm.co.jp/product/*
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
@@ -13,21 +14,31 @@
     'use strict';
 
     function addCopyButton() {
-        const title = [...document.querySelectorAll('.informationList__ttl')]
-            .find(el => el.textContent.trim() === '配信開始日');
-        if (!title) return;
+        const isDoujin = location.hostname === 'www.dmm.co.jp';
+        let dateElement;
 
-        const dateElement = title.nextElementSibling;
+        if (isDoujin) {
+            const title = [...document.querySelectorAll('.informationList__ttl')]
+                .find(el => el.textContent.trim() === '配信開始日');
+            if (!title) return;
+            dateElement = title.nextElementSibling;
+        } else {
+            dateElement = document.querySelector(
+                'span[data-testid="volume-detail-info-content-publish-date"]'
+            );
+        }
+
         if (!dateElement) return;
 
         if (dateElement.querySelector('.tm-copy-date-btn')) return;
 
         const text = dateElement.textContent.trim();
         const match = text.match(/^(\d{4})\/(\d{2})\/(\d{2})/);
+
         if (!match) return;
 
         const [, year, month, day] = match;
-        const copyText = year.slice(2) + month + day;
+        const copyText = `[${year.slice(2) + month + day}]`;
         const button = document.createElement('button');
 
         button.className = 'tm-copy-date-btn';
@@ -52,5 +63,6 @@
         });
         dateElement.appendChild(button);
     }
+
     addCopyButton();
 })();
