@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Gaugau Scraper
 // @namespace    http://tampermonkey.net/
-// @version      0.9.5
-// @description  Switch the reader to full-screen. Also supports: cmoa, yanmaga, 123hon
+// @version      0.9.6
+// @description  Switch the reader to full-screen. Also supports: cmoa, yanmaga, 123hon, kirapo
 // @author       You
 // @match        https://www.cmoa.jp/bib/speedreader*
 // @match        https://yanmaga.jp/viewer/comics/*
 // @match        https://www.123hon.com/vw/*
 // @match        https://gaugau.futabanet.jp/list/work/*/episodes/*
+// @match        https://kirapo.jp/pt/meteor/*
 // @grant        none
 // ==/UserScript==
 
